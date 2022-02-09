@@ -240,6 +240,8 @@ class Student extends PureComponent {
             <Card 
                 title={
                     <Fragment>
+                        <h1>Student List</h1>
+                        <p><small>Bulk Action</small></p>
                         <Row style={{marginBottom: 8}}>
                             <Col>
                                 <Select 
@@ -247,8 +249,8 @@ class Student extends PureComponent {
                                     allowClear
                                     disabled={!hasSelected} 
                                     loading={is_bulk_active}
-                                    value={this.state.bulk_action || 'Select Action'}
-                                    placeholder="Select Action"
+                                    value={this.state.bulk_action || 'Select an option'}
+                                    placeholder="Select an option"
                                     onChange={(value) => {
                                         // console.log({value});
                                         this.setState({bulk_action: value});
@@ -264,7 +266,7 @@ class Student extends PureComponent {
                                     type="primary"
                                     disabled={!this.state.bulk_action}
                                     onClick={this.bulk_update}
-                                >Updated</Button>
+                                >Update</Button>
                             </Col>
                         </Row>
                         <Fragment>
@@ -308,6 +310,7 @@ class Student extends PureComponent {
                         style={{fontSize: '14px'}}
                         rowSelection={rowSelection} 
                         rowKey={record => record._id}
+                        scroll={{ x: '100%' }}
                         columns={columns} 
                         dataSource={this.state.studentList} 
                         loading={this.state.loading}

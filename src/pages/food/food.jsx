@@ -1,4 +1,4 @@
-import { Divider, message, Table, notification, Row, Col, Card, Input, Button, Form, Skeleton } from 'antd';
+import { Divider, message, Table, notification, Row, Col, Card, Input, Button, Form, Skeleton, Modal } from 'antd';
 import React, { Component, Fragment } from 'react';
 import {getFoods, deleteFood, addFood} from '../../services/food_api';
 import Update from './components/update';
@@ -16,6 +16,7 @@ export default class Food extends Component {
             totalData: 0,
             editableData: false,
             isEditable: false,
+            isAddFood: false,
         };
     }
 
@@ -126,26 +127,39 @@ export default class Food extends Component {
         
             <Card
                 style={{ width: '100%' }}
+                title={<h1>Food List</h1>}
+                extra={
+                    <Button type="primary" onClick={() => this.setState({isAddFood: true})}>Add Food</Button>
+                }
             >
-                <Form>
-                    <Row>
-                        <Col span={5}>
-                            <label>Food name:</label>
-                            <Input allowClear placeholder='Enter food name' type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
-                        </Col>
-                        <Col span={5} style={{marginLeft: 10}}>
-                            <label>Food price:</label>
-                            <Input allowClear placeholder='Enter food price' type="text" value={this.state.price} onChange={(e) => this.setState({price: e.target.value})} />
-                        </Col>
+                <Modal
+                    title="Add Food"
+                    visible={this.state.isAddFood}
+                    onOk={() => this.addingFood()}
+                    onCancel={() => this.setState({isAddFood: false})}
+                >
+                    <Form>
+                        <Row>
+                            <Col span={11}>
+                                <label>Food name:</label>
+                                <Input allowClear placeholder='Enter food name' type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
+                            </Col>
+                            <Col span={11} style={{marginLeft: 10}}>
+                                <label>Food price:</label>
+                                <Input allowClear placeholder='Enter food price' type="text" value={this.state.price} onChange={(e) => this.setState({price: e.target.value})} />
+                            </Col>
 
-                    </Row>
-                </Form>
-                <Button style={{margin: "10px 0"}} type="primary" onClick={() => this.addingFood()}>Add Food</Button>
+                        </Row>
+                    </Form>
+                    {/* <Button style={{margin: "10px 0"}} type="primary" onClick={() => this.addingFood()}>Add Food</Button> */}
+
+                </Modal>
                 <Skeleton loading={!this.state.columns.length} avatar>
                     <Table
                         bordered
                         style={{fontSize: '14px'}}
                         loading={this.state.loading}
+                        scroll={{ x: '100%' }}
                         rowKey={record => record._id}
                         columns={this.state.columns}
                         dataSource={this.state.food_list}
