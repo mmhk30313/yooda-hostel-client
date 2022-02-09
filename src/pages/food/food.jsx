@@ -1,4 +1,4 @@
-import { Divider, message, Table, notification, Row, Col, Card, Input, Button, Form } from 'antd';
+import { Divider, message, Table, notification, Row, Col, Card, Input, Button, Form, Skeleton } from 'antd';
 import React, { Component, Fragment } from 'react';
 import {getFoods, deleteFood, addFood} from '../../services/food_api';
 import Update from './components/update';
@@ -64,39 +64,39 @@ export default class Food extends Component {
     getFoods = async() => {
         const food_res = await getFoods({pageNumber: this.state.pageNumber, 
             nPerPage: this.state.nPerPage});
+        const columns = [
+            {
+                title: 'Name',
+                dataIndex: 'name',
+                key: 'name',
+            },
+            {
+                title: 'Price',
+                dataIndex: 'price',
+                key: 'price',
+            },
+            {
+                title: 'Created At',
+                dataIndex: 'createdAt',
+                key: 'createdAt',
+                render: (text, record) => <span>{new Date(record.createdAt).toLocaleString()}</span>,
+            },
+            {
+                title: 'Action',
+                dataIndex: '_id',
+                key: 'action',
+                align: 'right',
+                render: (text, record) => (
+                    <Fragment>
+                        <a href="javascript:;" onClick={() => this.editFood(record)}>Edit</a>
+                        <Divider type="vertical" />
+                        <a href="javascript:;" onClick={() => this.deleteFood(record)}>Delete</a>
+                    </Fragment>
+                ),
+            },
+        ];
         if(food_res?.success){
             // message.destroy();
-            const columns = [
-                {
-                    title: 'Name',
-                    dataIndex: 'name',
-                    key: 'name',
-                },
-                {
-                    title: 'Price',
-                    dataIndex: 'price',
-                    key: 'price',
-                },
-                {
-                    title: 'Created At',
-                    dataIndex: 'createdAt',
-                    key: 'createdAt',
-                    render: (text, record) => <span>{new Date(record.createdAt).toLocaleString()}</span>,
-                },
-                {
-                    title: 'Action',
-                    dataIndex: '_id',
-                    key: 'action',
-                    align: 'right',
-                    render: (text, record) => (
-                        <Fragment>
-                            <a href="javascript:;" onClick={() => this.editFood(record)}>Edit</a>
-                            <Divider type="vertical" />
-                            <a href="javascript:;" onClick={() => this.deleteFood(record)}>Delete</a>
-                        </Fragment>
-                    ),
-                },
-            ]
             this.setState({food_list: food_res.data, columns, 
                 totalData: food_res.data_length, loading: true},
                 () => setTimeout(() => {
@@ -108,7 +108,7 @@ export default class Food extends Component {
             message.destroy();
             message.error(`${food_res.message}`);
 
-            this.setState({food_list: [], columns: [], totalData: 0, loading: false});
+            this.setState({food_list: [], columns, totalData: 0, loading: false});
         }
     }
 
@@ -141,21 +141,23 @@ export default class Food extends Component {
                     </Row>
                 </Form>
                 <Button style={{margin: "10px 0"}} type="primary" onClick={() => this.addingFood()}>Add Food</Button>
-                <Table
-                    bordered
-                    style={{fontSize: '14px'}}
-                    loading={this.state.loading}
-                    rowKey={record => record._id}
-                    columns={this.state.columns}
-                    dataSource={this.state.food_list}
-                    pagination={{
-                        total: this.state.totalData,
-                        pageSize: this.state.nPerPage,
-                        onChange: (page, pageSize) => {
-                            this.setState({pageNumber: page}, () => this.getFoods());
-                        },
-                    }}
-                />
+                <Skeleton loading={!this.state.columns.length} avatar>
+                    <Table
+                        bordered
+                        style={{fontSize: '14px'}}
+                        loading={this.state.loading}
+                        rowKey={record => record._id}
+                        columns={this.state.columns}
+                        dataSource={this.state.food_list}
+                        pagination={{
+                            total: this.state.totalData,
+                            pageSize: this.state.nPerPage,
+                            onChange: (page, pageSize) => {
+                                this.setState({pageNumber: page}, () => this.getFoods());
+                            },
+                        }}
+                    />
+                </Skeleton>
             </Card>
         </Fragment>;
     }

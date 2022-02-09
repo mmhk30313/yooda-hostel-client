@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Table, Button, Divider, Select, message, notification, Card, Row, Col } from 'antd';
+import { Table, Button, Divider, Select, message, notification, Card, Row, Col, Skeleton } from 'antd';
 import {DeleteOutlined, EditOutlined, NotificationOutlined} from '@ant-design/icons';
 import * as student_api from '../../services/student_api';
 import AddEditStudent from './components/addEditStudent';
@@ -58,79 +58,79 @@ class Student extends PureComponent {
         const student_res = await student_api.getStudents({pageNumber: this.state.pageNumber, 
             nPerPage: this.state.nPerPage});
         // console.log({student_res});
-        if (student_res?.success) {
-            const columns = [
-                {
-                    title: 'Roll',
-                    dataIndex: 'roll',
-                    key: 'roll',
+        const columns = [
+            {
+                title: 'Roll',
+                dataIndex: 'roll',
+                key: 'roll',
 
-                },
-                {
-                    title: 'Name',
-                    dataIndex: 'fullName',
-                    key: 'name',
-                },
-                {
-                    title: 'Age',
-                    dataIndex: 'age',
-                    key: 'age',
-                },
-                {
-                    title: 'Class',
-                    dataIndex: 'class',
-                    key: 'class',
-                },
-                {
-                    title: 'Hall',
-                    dataIndex: 'hall',
-                    key: 'hall',
-                },
-                {
-                    title: 'Created At',
-                    dataIndex: 'createdAt',
-                    key: 'createdAt',
-                    render: (text, record) => <span>{new Date(record.createdAt).toLocaleString()}</span>,
-                },
-                {
-                    title: 'Status',
-                    dataIndex: 'status',
-                    key: 'status',
-                    render: (text, record) => {
-                        if(record.status === 'active'){
-                            return <span style={{color: 'green'}}>{"Active"}</span>;
-                        } else if(record.status === 'inActive'){
-                            return <span style={{color: 'red'}}>{"Inactive"}</span>;
-                        }
-                        return <span style={{color: 'blue'}}>{"Already serve"}</span>;
+            },
+            {
+                title: 'Name',
+                dataIndex: 'fullName',
+                key: 'name',
+            },
+            {
+                title: 'Age',
+                dataIndex: 'age',
+                key: 'age',
+            },
+            {
+                title: 'Class',
+                dataIndex: 'class',
+                key: 'class',
+            },
+            {
+                title: 'Hall',
+                dataIndex: 'hall',
+                key: 'hall',
+            },
+            {
+                title: 'Created At',
+                dataIndex: 'createdAt',
+                key: 'createdAt',
+                render: (text, record) => <span>{new Date(record.createdAt).toLocaleString()}</span>,
+            },
+            {
+                title: 'Status',
+                dataIndex: 'status',
+                key: 'status',
+                render: (text, record) => {
+                    if(record.status === 'active'){
+                        return <span style={{color: 'green'}}>{"Active"}</span>;
+                    } else if(record.status === 'inActive'){
+                        return <span style={{color: 'red'}}>{"Inactive"}</span>;
                     }
-                },
-                {
-                    title: 'Distribution',
-                    dataIndex: 'roll',
-                    key: 'distribution',
-                    align: 'center',
-                    render: (roll, record) => {
-                        return <span style={{color: '#bd07b1', cursor: 'pointer'}} onClick={() => this.setState({isDistribution: true, fordDisRoll: roll})}><NotificationOutlined/></span>
-                    }
-                },
-                {
-                    title: 'Action',
-                    dataIndex: '_id',
-                    key: 'action',
-                    align: 'right',
-                    width: '15%',
-                    render: (text, record) => (
-                        <Fragment>
-                            <span style={{color: "blue", cursor: 'pointer'}} onClick={() =>  this.setState({showAddEditStudentModal: true, isEditable: true, editableData: record})}><EditOutlined /></span>
-                            {/* <Button type="primary" onClick={() => this.editStudent(record)} >Edit</Button> */}
-                            <Divider type="vertical" />
-                            <span style={{color: "red", cursor: 'pointer'}} onClick={() => this.deleteStudent(record)}><DeleteOutlined /></span>
-                            {/* <Button type="danger" onClick={() => this.deleteStudent(record)}>Delete</Button> */}
-                        </Fragment>
-                    )
+                    return <span style={{color: 'blue'}}>{"Already serve"}</span>;
                 }
-            ];
+            },
+            {
+                title: 'Distribution',
+                dataIndex: 'roll',
+                key: 'distribution',
+                align: 'center',
+                render: (roll, record) => {
+                    return <span style={{color: '#bd07b1', cursor: 'pointer'}} onClick={() => this.setState({isDistribution: true, fordDisRoll: roll})}><NotificationOutlined/></span>
+                }
+            },
+            {
+                title: 'Action',
+                dataIndex: '_id',
+                key: 'action',
+                align: 'right',
+                width: '15%',
+                render: (text, record) => (
+                    <Fragment>
+                        <span style={{color: "blue", cursor: 'pointer'}} onClick={() =>  this.setState({showAddEditStudentModal: true, isEditable: true, editableData: record})}><EditOutlined /></span>
+                        {/* <Button type="primary" onClick={() => this.editStudent(record)} >Edit</Button> */}
+                        <Divider type="vertical" />
+                        <span style={{color: "red", cursor: 'pointer'}} onClick={() => this.deleteStudent(record)}><DeleteOutlined /></span>
+                        {/* <Button type="danger" onClick={() => this.deleteStudent(record)}>Delete</Button> */}
+                    </Fragment>
+                )
+            }
+        ];
+        if (student_res?.success) {
 
             this.setState({
                 studentList: student_res.data,
@@ -149,23 +149,14 @@ class Student extends PureComponent {
         }else{
             message.destroy();
             message.error(student_res.message);
-            this.setState({studentList: [], totalData: 0, loading: false});
+            this.setState({studentList: [], totalData: 0, columns, loading: false});
         }
     };
 
     foodDistribution = async (dataObj) => {
         const payload = {...dataObj};
-        console.log({payload});
+        // console.log({payload});
         this.editStudent(payload, true);
-        // const res = await student_api.foodDistribution(payload);
-        // if(res?.success){
-        //     message.destroy();
-        //     message.success(res.message);
-        //     this.getStudents();
-        // }else{
-        //     message.destroy();
-        //     message.error(res.message);
-        // }
     }
 
     editStudent = async(data, forDistribution = false) => {
@@ -311,22 +302,24 @@ class Student extends PureComponent {
                         foodDistribution={this.foodDistribution} />
                     : null
                 }
-                <Table 
-                    bordered
-                    style={{fontSize: '14px'}}
-                    rowSelection={rowSelection} 
-                    rowKey={record => record._id}
-                    columns={columns} 
-                    dataSource={this.state.studentList} 
-                    loading={this.state.loading}
-                    pagination={{
-                        total: this.state.totalData,
-                        pageSize: this.state.nPerPage,
-                        onChange: (page, pageSize) => {
-                            this.setState({pageNumber: page}, () => this.getStudents());
-                        },
-                    }}
-                />
+                <Skeleton loading={!this.state.columns.length}>
+                    <Table 
+                        bordered
+                        style={{fontSize: '14px'}}
+                        rowSelection={rowSelection} 
+                        rowKey={record => record._id}
+                        columns={columns} 
+                        dataSource={this.state.studentList} 
+                        loading={this.state.loading}
+                        pagination={{
+                            total: this.state.totalData,
+                            pageSize: this.state.nPerPage,
+                            onChange: (page, pageSize) => {
+                                this.setState({pageNumber: page}, () => this.getStudents());
+                            },
+                        }}
+                    />
+                </Skeleton>
             </Card>
         );
     }

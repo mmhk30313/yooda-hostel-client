@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import {Modal, Select,message, notification, Form, Card, Descriptions, DatePicker} from 'antd';
+import {Modal, Select,message, notification, Form, Card, Descriptions, DatePicker, Skeleton} from 'antd';
 import * as food_api from '../../../services/food_api';
 import * as student_api from '../../../services/student_api';
 
@@ -73,8 +73,13 @@ export default class FoodDistribution extends Component {
     handleOk = () => {
         const {_id, date, shift, foodItemList} = this.state;
         if(!foodItemList.length){
-            message.destroy();
-            message.error('Please select at least one food');
+            notification.destroy();
+            notification.error({
+                message: 'Foods not selected',
+                description: 'Please select at least one food',
+            });
+            // message.destroy();
+            // message.error('Please select at least one food');
             return;
         }
         const payload = {_id, status: "served", date, shift, foodItemList};
@@ -102,9 +107,8 @@ export default class FoodDistribution extends Component {
         
 
         >
-            {
-                this.state._id
-                ? <Descriptions title="Student Info">
+            <Skeleton loading={!this.state._id}>
+                <Descriptions title="Student Info">
                     <Descriptions.Item label="Name">{this.state.fullName}</Descriptions.Item>
                     <Descriptions.Item label="Roll">{this.state.roll}</Descriptions.Item>
                     <Descriptions.Item label="Age">{this.state.age}</Descriptions.Item>
@@ -120,49 +124,48 @@ export default class FoodDistribution extends Component {
                         : null
                     }
                 </Descriptions>
-                : null
-            }
-            <Card>
-                <Form
-                    labelCol={{ span: 4 }}
-                    wrapperCol={{ span: 16 }}
-                >
-                    <Form.Item label="Shift">
-                        <Select
-                            showSearch
-                            allowClear
-                            placeholder="Select Shift"
-                            optionFilterProp="children"
-                            onChange={(value) => this.setState({shift: value})}
-                        >
-                            <Option value="Morning">Morning</Option>
-                            <Option value="Evening">Evening</Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item label="Date">
-                        <DatePicker onChange={(e) => {
-                            console.log({date: e?._d});
-                            this.setState({date: e?._d});
-                        }} />
-                    </Form.Item>
-                    <Form.Item label="Foods" rules={[{ required: true }]}>
-                        <Select
-                            mode="multiple"
-                            showSearch
-                            allowClear
-                            style={{ width: '100%' }}
-                            placeholder="Select Foods"
-                            onChange={(value) => this.setState({foodItemList: value})}
-                        >
-                            {
-                                this.state.foods.map((food) => {
-                                    return <Option key={food._id} value={food._id}>{food.name}</Option>
-                                })
-                            }
-                        </Select>
-                    </Form.Item>
-                </Form>
-            </Card>
+                <Card>
+                    <Form
+                        labelCol={{ span: 4 }}
+                        wrapperCol={{ span: 16 }}
+                    >
+                        <Form.Item label="Shift">
+                            <Select
+                                showSearch
+                                allowClear
+                                placeholder="Select Shift"
+                                optionFilterProp="children"
+                                onChange={(value) => this.setState({shift: value})}
+                            >
+                                <Option value="Morning">Morning</Option>
+                                <Option value="Evening">Evening</Option>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item label="Date">
+                            <DatePicker onChange={(e) => {
+                                console.log({date: e?._d});
+                                this.setState({date: e?._d});
+                            }} />
+                        </Form.Item>
+                        <Form.Item label="Foods" rules={[{ required: true }]}>
+                            <Select
+                                mode="multiple"
+                                showSearch
+                                allowClear
+                                style={{ width: '100%' }}
+                                placeholder="Select Foods"
+                                onChange={(value) => this.setState({foodItemList: value})}
+                            >
+                                {
+                                    this.state.foods.map((food) => {
+                                        return <Option key={food._id} value={food._id}>{food.name}</Option>
+                                    })
+                                }
+                            </Select>
+                        </Form.Item>
+                    </Form>
+                </Card>
+            </Skeleton>
         </Modal>
     )}
 }
