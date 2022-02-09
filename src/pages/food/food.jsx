@@ -39,6 +39,7 @@ export default class Food extends Component {
             this.setState({
                 name: '',
                 price: '',
+                isAddFood: false,
             });
         }
     };
