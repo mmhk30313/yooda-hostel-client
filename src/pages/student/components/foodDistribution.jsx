@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import {Modal, Select,message, notification, Form, Card, Descriptions, DatePicker, Skeleton} from 'antd';
+import moment from 'moment';
 import * as food_api from '../../../services/food_api';
 import * as student_api from '../../../services/student_api';
 
@@ -38,9 +39,9 @@ export default class FoodDistribution extends Component {
             message.error('Student not found');
             return;
         }
-        console.log(student_res);
+        // console.log(student_res);
         const student = student_res.data;
-        console.log({student});
+        // console.log({student});
         this.setState({
             fullName: student.fullName,
             roll: student.roll,
@@ -48,9 +49,11 @@ export default class FoodDistribution extends Component {
             hall: student.hall,
             age: student.age,
             status: student.status,
-            hall: student.hall,
-            shift: student.shift,
-            givenFoods: student.foodItemList,
+            hall: student?.hall || '',
+            shift: student?.shift || '',
+            date: student?.date || '',
+            foodItemList: student?.foodItemList || [],
+            givenFoods: student?.foodItemList || [],
             _id: student._id,
             // visible: true,
         });
@@ -59,39 +62,74 @@ export default class FoodDistribution extends Component {
 
     findFoods = async () => {
         const food_res = await food_api.getAllFoods();
-        console.log({food_res});
+        // console.log({food_res});
         if(!food_res?.success){
             message.destroy();
             message.error('Foods not found');
             return;
         }
         this.setState({
-            foods: food_res.data,
+            foods: food_res.data.length ? food_res.data : ["No Food Found"],
         });
     }
 
     handleOk = () => {
-        const {_id, date, shift, foodItemList} = this.state;
+        const {_id, status, date, shift, foodItemList} = this.state;
         if(!foodItemList.length){
             notification.destroy();
             notification.error({
                 message: 'Foods not selected',
                 description: 'Please select at least one food',
             });
-            // message.destroy();
-            // message.error('Please select at least one food');
+            return;
+        }else if(foodItemList[0] === 'No Food Found'){
+            notification.destroy();
+            notification.error({
+                message: 'Foods not found',
+                description: 'Please add food first',
+            });
+            return;
+        }else if(status === 'served' || this.state.givenFoods.length ){
+            notification.destroy();
+            notification.error({
+                message: 'Student already served',
+                description: 'Please select another student',
+            });
             return;
         }
-        const payload = {_id, status: "served", date, shift, foodItemList};
-        this.props.foodDistribution(payload);
+
+        const payload = {_id, status: "served", date, shift, foodItemList};;
         this.setState({
             visible: false,
-        }, () => this.props.cancelDistribution());
+            _id: '',
+            fullName: '',
+            roll: '',
+            class_name: '',
+            hall: '',
+            age: '',
+            status: '',
+            date: '',
+            shift: '',
+            foodItemList: [],
+            foods: [],
+        }, () => this.props.foodDistribution(payload));
+        // }, () => this.props.cancelDistribution());
     };
 
     handleCancel = () => {
         this.setState({
             visible: false,
+            _id: '',
+            fullName: '',
+            roll: '',
+            class_name: '',
+            hall: '',
+            age: '',
+            status: '',
+            date: '',
+            shift: '',
+            foodItemList: [],
+            foods: [],
         }, () => this.props.cancelDistribution());
     };
 
@@ -107,7 +145,7 @@ export default class FoodDistribution extends Component {
         
 
         >
-            <Skeleton loading={!this.state._id}>
+            <Skeleton loading={!this.state._id || !this.state.foods.length}>
                 <Descriptions title="Student Info">
                     <Descriptions.Item label="Name">{this.state.fullName}</Descriptions.Item>
                     <Descriptions.Item label="Roll">{this.state.roll}</Descriptions.Item>
@@ -117,7 +155,7 @@ export default class FoodDistribution extends Component {
                         {this.state.hall}
                     </Descriptions.Item>
                     {
-                        this.state.status === "served"
+                        this.state.givenFoods.length
                         ? <Fragment>
                             <Descriptions.Item label="Status"><span style={{color: 'red'}}>Already Served</span></Descriptions.Item>
                         </Fragment>
@@ -135,6 +173,7 @@ export default class FoodDistribution extends Component {
                                 allowClear
                                 placeholder="Select Shift"
                                 optionFilterProp="children"
+                                value={this.state?.shift || 'Select'}
                                 onChange={(value) => this.setState({shift: value})}
                             >
                                 <Option value="Morning">Morning</Option>
@@ -142,8 +181,8 @@ export default class FoodDistribution extends Component {
                             </Select>
                         </Form.Item>
                         <Form.Item label="Date">
-                            <DatePicker onChange={(e) => {
-                                console.log({date: e?._d});
+                            <DatePicker value={this.state?.date ? moment(new Date(this.state?.date), 'DD/MM/YY') : ''} onChange={(e) => {
+                                // console.log({date: e?._d});
                                 this.setState({date: e?._d});
                             }} />
                         </Form.Item>
@@ -153,6 +192,7 @@ export default class FoodDistribution extends Component {
                                 showSearch
                                 allowClear
                                 style={{ width: '100%' }}
+                                value={this.state.foodItemList || []}
                                 placeholder="Select Foods"
                                 onChange={(value) => this.setState({foodItemList: value})}
                             >

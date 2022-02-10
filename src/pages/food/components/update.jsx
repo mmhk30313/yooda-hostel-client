@@ -28,6 +28,8 @@ const Update = ({data, cancelEdit, isEditable, getFoods}) => {
 
     const handleCancel = () => {
         setVisible(false);
+        setName("");
+        setPrice("");
         cancelEdit();
     };
 

@@ -53,15 +53,28 @@ export default class AddEditStudent extends Component {
         }
 
         const payload = {fullName, roll, class: class_name, hall, age, status};
-        this.props.addStudent(payload);
+        // this.props.addStudent(payload);
         this.setState({
             visible: false,
-        });
+            fullName: '', 
+            roll: '', 
+            hall: '', 
+            class_name: '', 
+            age: '', 
+            status: ''
+            
+        }, () => this.props.addStudent(payload));
     };
-
+    
     handleCancel = () => {
         this.setState({
             visible: false,
+            fullName: '', 
+            roll: '', 
+            hall: '', 
+            class_name: '', 
+            age: '', 
+            status: ''
         }, () => this.props.cancelAdd());
     };
 

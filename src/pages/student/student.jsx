@@ -40,12 +40,17 @@ class Student extends PureComponent {
             return;
         }
         const payload = {...dataObj};
+        this.setState({loading: true});
         const addStudentRes = await student_api.addStudent(payload);
         if (addStudentRes?.success) {
             this.setState({
                 showAddEditStudentModal: false,
                 
             },() => this.getStudents())
+        }else{
+            message.destroy();
+            message.error('Something went wrong');
+            this.getStudents();
         }
     };
     
@@ -96,12 +101,13 @@ class Student extends PureComponent {
                 dataIndex: 'status',
                 key: 'status',
                 render: (text, record) => {
-                    if(record.status === 'active'){
+                    // console.log({record});
+                    if(record.foodItemList.length){
+                        return <span style={{color: 'blue'}}>{"Already serve"}</span>
+                    }else if(record.status === 'active'){
                         return <span style={{color: 'green'}}>{"Active"}</span>;
-                    } else if(record.status === 'inActive'){
-                        return <span style={{color: 'red'}}>{"Inactive"}</span>;
                     }
-                    return <span style={{color: 'blue'}}>{"Already serve"}</span>;
+                    return <span style={{color: 'red'}}>{"Inactive"}</span>;
                 }
             },
             {
@@ -131,7 +137,7 @@ class Student extends PureComponent {
             }
         ];
         if (student_res?.success) {
-
+            // console.log({student_res: student_res.data});
             this.setState({
                 studentList: student_res.data,
                 totalData: student_res.data_length,
@@ -161,6 +167,7 @@ class Student extends PureComponent {
 
     editStudent = async(data, forDistribution = false) => {
         // console.log({data});
+        this.setState({loading: true});
         const update_res = await student_api.updateStudent(data);
         if(update_res?.success){
             if(forDistribution){
@@ -170,16 +177,21 @@ class Student extends PureComponent {
                     description: 'Food distribution successfully',
                 });
             }
-            this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false}, () => this.getStudents());
+            this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false, }, () => this.getStudents());
+        }else{
+            message.destroy();
+            message.error(update_res.message);
+            this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false, loading: false});
         }
     };
     
     cancelEdit = () => {
-        this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false});
+        this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false, loading: false});
     };
 
     deleteStudent = async(data) => {
         // console.log({data});
+        this.setState({loading: true});
         const delete_res = await student_api.deleteStudent(data._id);
         if(delete_res?.success){
             this.getStudents();
@@ -188,6 +200,7 @@ class Student extends PureComponent {
                 description: delete_res.message,
             });
         }else{
+            this.getStudents();
             message.error(delete_res.message);
         }
     };
