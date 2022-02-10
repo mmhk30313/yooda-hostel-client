@@ -210,7 +210,7 @@ class Student extends PureComponent {
     };
 
     bulk_update = async() => {
-        this.setState({ is_bulk_active: true });
+        this.setState({ is_bulk_active: true, loading: true });
         // ajax request after empty completing
         const { selectedRowKeys, bulk_action } = this.state;
         // console.log({selectedRowKeys});
@@ -220,7 +220,7 @@ class Student extends PureComponent {
             return;
         }
         const payload = {bulk_ids: selectedRowKeys, status: bulk_action};
-        console.log({payload});
+        // console.log({payload});
         const bulk_res = await student_api.bulkUpdate_status(payload);
         if(bulk_res?.success){
             this.getStudents();
@@ -228,13 +228,6 @@ class Student extends PureComponent {
         }else{
             message.error(bulk_res.message);
         }
-        setTimeout(() => {
-          this.setState({
-            selectedRowKeys: [],
-            is_bulk_active: false,
-            bulk_action: '',
-          });
-        }, 1000);
     };
 
     onSelectChange = (selectedRowKeys) => {
@@ -254,93 +247,95 @@ class Student extends PureComponent {
         // console.log({showModal: this.state.showAddEditStudentModal});
         // console.log({showModal: this.state.isDistribution});
         return (
-            <Card 
-                title={
-                    <Fragment>
-                        <h1>Student List</h1>
-                        <p><small>Bulk Action</small></p>
-                        <Row style={{marginBottom: 8}}>
-                            <Col>
-                                <Select 
-                                    type="primary"
-                                    allowClear
-                                    disabled={!hasSelected} 
-                                    loading={is_bulk_active}
-                                    value={this.state.bulk_action || 'Select an option'}
-                                    placeholder="Select an option"
-                                    onChange={(value) => {
-                                        // console.log({value});
-                                        this.setState({bulk_action: value});
-                                    }}
-                                >
-                                    <Option key={1} value={"active"}>Active</Option>
-                                    <Option key={2} value={"inActive"}>Inactive</Option>
-                                </Select>
-                            
-                            </Col>
-                            <Col span={4} style={{marginLeft: 8}}>
-                                <Button 
-                                    type="primary"
-                                    disabled={!this.state.bulk_action}
-                                    onClick={this.bulk_update}
-                                >Update</Button>
-                            </Col>
-                        </Row>
-                        <Fragment>
-                                {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
-                        </Fragment>
-                    </Fragment>
-                }
+            <Fragment>
 
-                extra={
+                <Card
+                    title={<h1>STUDENT LIST</h1>}
+                    extra={
+                        <Fragment>
+                            <Button type="primary" onClick={() => this.setState({showAddEditStudentModal: true})}>
+                                Add Student
+                            </Button>
+                        </Fragment>
+                    }
+                >
                     <Fragment>
-                        <Button type="primary" onClick={() => this.setState({showAddEditStudentModal: true})}>
-                            Add Student
-                        </Button>
+                            <p><small>Bulk Action</small></p>
+                            <Row style={{marginBottom: 8}}>
+                                <Col>
+                                    <Select 
+                                        type="primary"
+                                        allowClear
+                                        disabled={!hasSelected} 
+                                        loading={is_bulk_active}
+                                        value={this.state.bulk_action || 'Select an option'}
+                                        placeholder="Select an option"
+                                        onChange={(value) => {
+                                            // console.log({value});
+                                            this.setState({bulk_action: value});
+                                        }}
+                                    >
+                                        <Option key={1} value={"active"}>Active</Option>
+                                        <Option key={2} value={"inActive"}>Inactive</Option>
+                                    </Select>
+                                
+                                </Col>
+                                <Col span={4} style={{marginLeft: 8}}>
+                                    <Button 
+                                        type="primary"
+                                        disabled={!this.state.bulk_action}
+                                        onClick={this.bulk_update}
+                                    >Update</Button>
+                                </Col>
+                            </Row>
+                            <Fragment>
+                                    {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
+                            </Fragment>
+                        </Fragment>
+                    <Fragment>
+                        {
+                            this.state.showAddEditStudentModal
+                            ? <AddEditStudent
+                                visible={this.state.showAddEditStudentModal}  
+                                cancelAdd={this.cancelAdd}
+                                addStudent={this.addingStudent}
+                                editableData={this.state.editableData}
+                                updateStudent={this.editStudent}
+                                isEditable={this.state.isEditable}
+                            />
+                            : null
+                        }
+                        {
+                            this.state.isDistribution
+                            ? <FoodDistribution 
+                                cancelDistribution={this.cancelEdit}
+                                visible={true}
+                                studentRoll={this.state.fordDisRoll} 
+                                foodDistribution={this.foodDistribution} />
+                            : null
+                        }
+                        <Skeleton loading={!this.state.columns.length}>
+                            <Table 
+                                bordered
+                                style={{fontSize: '14px'}}
+                                rowSelection={rowSelection} 
+                                rowKey={record => record._id}
+                                scroll={{ x: '100%' }}
+                                columns={columns} 
+                                dataSource={this.state.studentList} 
+                                loading={this.state.loading}
+                                pagination={{
+                                    total: this.state.totalData,
+                                    pageSize: this.state.nPerPage,
+                                    onChange: (page, pageSize) => {
+                                        this.setState({pageNumber: page}, () => this.getStudents());
+                                    },
+                                }}
+                            />
+                        </Skeleton>
                     </Fragment>
-                }
-            >
-                {
-                    this.state.showAddEditStudentModal
-                    ? <AddEditStudent
-                        visible={this.state.showAddEditStudentModal}  
-                        cancelAdd={this.cancelAdd}
-                        addStudent={this.addingStudent}
-                        editableData={this.state.editableData}
-                        updateStudent={this.editStudent}
-                        isEditable={this.state.isEditable}
-                    />
-                    : null
-                }
-                {
-                    this.state.isDistribution
-                    ? <FoodDistribution 
-                        cancelDistribution={this.cancelEdit}
-                        visible={true}
-                        studentRoll={this.state.fordDisRoll} 
-                        foodDistribution={this.foodDistribution} />
-                    : null
-                }
-                <Skeleton loading={!this.state.columns.length}>
-                    <Table 
-                        bordered
-                        style={{fontSize: '14px'}}
-                        rowSelection={rowSelection} 
-                        rowKey={record => record._id}
-                        scroll={{ x: '100%' }}
-                        columns={columns} 
-                        dataSource={this.state.studentList} 
-                        loading={this.state.loading}
-                        pagination={{
-                            total: this.state.totalData,
-                            pageSize: this.state.nPerPage,
-                            onChange: (page, pageSize) => {
-                                this.setState({pageNumber: page}, () => this.getStudents());
-                            },
-                        }}
-                    />
-                </Skeleton>
-            </Card>
+                </Card>
+            </Fragment>
         );
     }
 }

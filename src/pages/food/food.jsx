@@ -128,7 +128,7 @@ export default class Food extends Component {
         
             <Card
                 style={{ width: '100%' }}
-                title={<h1>Food List</h1>}
+                title={<h1>FOOD LIST</h1>}
                 extra={
                     <Button type="primary" onClick={() => this.setState({isAddFood: true})}>Add Food</Button>
                 }
