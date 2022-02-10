@@ -39,6 +39,7 @@ class Student extends PureComponent {
             message.error('Please fill roll number of the student');
             return;
         }
+        
         const payload = {...dataObj};
         this.setState({loading: true});
         const addStudentRes = await student_api.addStudent(payload);
@@ -48,9 +49,12 @@ class Student extends PureComponent {
                 
             },() => this.getStudents())
         }else{
-            message.destroy();
-            message.error('Something went wrong');
-            this.getStudents();
+            notification.destroy();
+            notification.error({notification: "Student add notification", message:addStudentRes?.message || 'Something went wrong'});
+            this.setState({
+                showAddEditStudentModal: false,
+                editableData: {},
+            },() => this.getStudents())
         }
     };
     
@@ -177,10 +181,10 @@ class Student extends PureComponent {
                     description: 'Food distribution successfully',
                 });
             }
-            this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false, }, () => this.getStudents());
+            this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false, editableData: {}}, () => this.getStudents());
         }else{
-            message.destroy();
-            message.error(update_res.message);
+            notification.destroy();
+            notification.error({notification: "Update notification", message: update_res?.message});
             this.setState({showAddEditStudentModal: false, isEditable: false, isDistribution: false, loading: false});
         }
     };

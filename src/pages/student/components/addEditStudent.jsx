@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import {Modal, Input, Select, Col, Row, Form, message} from 'antd';
+import {Modal, Input, Select, Col, Row, Form, message, notification} from 'antd';
+import * as student_api from '../../../services/student_api';
 const {Option} = Select;
 export default class AddEditStudent extends Component {
     constructor(props) {
@@ -33,37 +34,69 @@ export default class AddEditStudent extends Component {
             message.error('Please fill the fields of name and roll');
             return;
         }
-        const payload = {_id,fullName, roll, class_name, hall, age, status};
-        this.setState({
-            visible: false,
-        }, () => this.props.updateStudent(payload));
+        const payload = {_id,fullName, roll, class: class_name, hall, age, status};
+        const check_duplicate = await this.checkDuplicate({_id, roll});
+        if(check_duplicate){
+            // this.props.addStudent(payload);
+            this.setState({
+                visible: false,
+                fullName: '', 
+                roll: '', 
+                hall: '', 
+                class_name: '', 
+                age: '', 
+                status: ''
+                
+            }, () => this.props.updateStudent(payload));
+
+        }
+
     }
 
-    handleOk = () => {
+    checkDuplicate = async (dataObj) => {
+        const check_duplicate = await student_api.checkDuplicate(dataObj);
+        console.log({check_duplicate});
+        if(check_duplicate?.success){
+            notification.destroy();
+            notification.error({
+                message: 'Duplicate Roll',
+                description: 'Roll already exists',
+            });
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    handleOk = async() => {
         // console.log("Add Student");
         const {fullName, roll, hall, class_name, age, status} = this.state;
         if(!fullName){
             message.destroy();
-            message.error('Please fill the full name of the student');
+            message.warning('Please fill the full name of the student');
             return;
         }else if(!roll){
             message.destroy();
-            message.error('Please fill the roll number of the student');
+            message.warning('Please fill the roll number of the student');
             return;
         }
 
         const payload = {fullName, roll, class: class_name, hall, age, status};
-        // this.props.addStudent(payload);
-        this.setState({
-            visible: false,
-            fullName: '', 
-            roll: '', 
-            hall: '', 
-            class_name: '', 
-            age: '', 
-            status: ''
-            
-        }, () => this.props.addStudent(payload));
+        const check_duplicate = await this.checkDuplicate({roll});
+        if(check_duplicate){
+            // this.props.addStudent(payload);
+            this.setState({
+                visible: false,
+                fullName: '', 
+                roll: '', 
+                hall: '', 
+                class_name: '', 
+                age: '', 
+                status: ''
+                
+            }, () => this.props.addStudent(payload));
+
+        }
     };
     
     handleCancel = () => {

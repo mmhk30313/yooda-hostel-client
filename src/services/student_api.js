@@ -6,6 +6,13 @@ export const getStudentByRoll = (roll) => {
     });
 }
 
+export const checkDuplicate = (params) => {
+    return request("/api/student/check-duplicate", {
+        method: "POST",
+        body: params,
+    });
+}
+
 export const bulkUpdate_status = (params) => {
     return request("/api/student/bulk_update_status", {
         method: "POST",
