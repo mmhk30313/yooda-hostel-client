@@ -21,6 +21,7 @@ export default class FoodDistribution extends Component {
             date: '',
             shift: '',
             foodItemList: [],
+            givenFoods: [],
             foods: [],
 
         }
@@ -155,7 +156,7 @@ export default class FoodDistribution extends Component {
                         {this.state.hall}
                     </Descriptions.Item>
                     {
-                        this.state.givenFoods.length
+                        this.state?.givenFoods?.length
                         ? <Fragment>
                             <Descriptions.Item label="Status"><span style={{color: 'red'}}>Already Served</span></Descriptions.Item>
                         </Fragment>
