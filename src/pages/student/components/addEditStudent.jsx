@@ -36,7 +36,8 @@ export default class AddEditStudent extends Component {
         }
         const payload = {_id,fullName, roll, class: class_name, hall, age, status};
         const check_duplicate = await this.checkDuplicate({_id, roll});
-        if(check_duplicate){
+        // console.log(check_duplicate);
+        if(!check_duplicate){
             // this.props.addStudent(payload);
             this.setState({
                 visible: false,
@@ -53,24 +54,27 @@ export default class AddEditStudent extends Component {
 
     }
 
-    checkDuplicate = async (dataObj) => {
+    checkDuplicate = async(dataObj) => {
         const check_duplicate = await student_api.checkDuplicate(dataObj);
-        console.log({check_duplicate});
+        // console.log({check_duplicate});
         if(check_duplicate?.success){
-            notification.destroy();
-            notification.error({
-                message: 'Duplicate Roll',
-                description: 'Roll already exists',
-            });
             return false;
         }else{
+            notification.destroy();
+            notification.error({
+                message: 'Duplicate Notification',
+                description: check_duplicate.message,
+            });
             return true;
         }
     }
 
     handleOk = async() => {
-        // console.log("Add Student");
-        const {fullName, roll, hall, class_name, age, status} = this.state;
+        const {fullName, roll, hall, class_name, age, status, isEditable} = this.state;
+        // console.log({isEditable});
+        if(isEditable){
+            this.handleUpdate();
+        }
         if(!fullName){
             message.destroy();
             message.warning('Please fill the full name of the student');
@@ -79,24 +83,26 @@ export default class AddEditStudent extends Component {
             message.destroy();
             message.warning('Please fill the roll number of the student');
             return;
+        }else{
+            const payload = {fullName, roll, class: class_name, hall, age, status};
+            const check_duplicate = await this.checkDuplicate({roll});
+            console.log({check_duplicate});
+            if(!check_duplicate){
+                // this.props.addStudent(payload);
+                this.setState({
+                    visible: false,
+                    fullName: '', 
+                    roll: '', 
+                    hall: '', 
+                    class_name: '', 
+                    age: '', 
+                    status: ''
+                    
+                }, () => this.props.addStudent(payload));
+    
+            }
         }
 
-        const payload = {fullName, roll, class: class_name, hall, age, status};
-        const check_duplicate = await this.checkDuplicate({roll});
-        if(check_duplicate){
-            // this.props.addStudent(payload);
-            this.setState({
-                visible: false,
-                fullName: '', 
-                roll: '', 
-                hall: '', 
-                class_name: '', 
-                age: '', 
-                status: ''
-                
-            }, () => this.props.addStudent(payload));
-
-        }
     };
     
     handleCancel = () => {
@@ -112,6 +118,7 @@ export default class AddEditStudent extends Component {
     };
 
   render() {
+    // console.log({state: this.state});
     return <Modal
         title={`${this.state.isEditable ? "Update" : "Add"} Student`}
         visible={this.state.visible}

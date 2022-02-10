@@ -60,7 +60,7 @@ class Student extends PureComponent {
     
     cancelAdd = () => {
         console.log("Cancel Add");
-        this.setState({showAddEditStudentModal: false});
+        this.setState({showAddEditStudentModal: false, editableData: {}, isEditable: false});
     }
     
     getStudents = async () => {
