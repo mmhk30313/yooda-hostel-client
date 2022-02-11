@@ -21,5 +21,5 @@ Student(id, fullName, roll, age, class, hall, status)
 
 ### Used Tools & Technologies:
   * ReactJS, ExpressJS, MongoDB, Mongoose
-  * Antd (React Framework)
+  * Antd (React UI Library)
   * Netlify & Heroku

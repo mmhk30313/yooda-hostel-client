@@ -1,4 +1,4 @@
-import { Divider, message, Table, notification, Row, Col, Card, Input, Button, Form, Skeleton, Modal } from 'antd';
+import { Divider, message, Table, notification, Row, Col, Card, Input, Button, Form, Skeleton, Modal, Popconfirm } from 'antd';
 import React, { Component, Fragment } from 'react';
 import {getFoods, deleteFood, addFood} from '../../services/food_api';
 import Update from './components/update';
@@ -90,9 +90,17 @@ export default class Food extends Component {
                 align: 'right',
                 render: (text, record) => (
                     <Fragment>
-                        <a href="javascript:;" onClick={() => this.editFood(record)}>Edit</a>
+                        <span style={{color: "blue", cursor: 'pointer'}} onClick={() => this.editFood(record)}>Edit</span>
                         <Divider type="vertical" />
-                        <a href="javascript:;" onClick={() => this.deleteFood(record)}>Delete</a>
+                        <Popconfirm
+                            title="Are you sure to delete this food?"
+                            onConfirm={() => this.deleteFood(record)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <span style={{color: "red", cursor: 'pointer'}}>Delete</span>
+                        </Popconfirm>
+                        {/* <span onClick={() => this.deleteFood(record)}>Delete</span> */}
                     </Fragment>
                 ),
             },
