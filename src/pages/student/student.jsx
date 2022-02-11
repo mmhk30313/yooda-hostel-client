@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Table, Button, Divider, Select, message, notification, Card, Row, Col, Skeleton } from 'antd';
+import { Table, Button, Divider, Select, message, notification, Card, Row, Col, Skeleton, Popconfirm } from 'antd';
 import {DeleteOutlined, EditOutlined, NotificationOutlined} from '@ant-design/icons';
 import * as student_api from '../../services/student_api';
 import AddEditStudent from './components/addEditStudent';
@@ -134,7 +134,15 @@ class Student extends PureComponent {
                         <span style={{color: "blue", cursor: 'pointer'}} onClick={() =>  this.setState({showAddEditStudentModal: true, isEditable: true, editableData: record})}><EditOutlined /></span>
                         {/* <Button type="primary" onClick={() => this.editStudent(record)} >Edit</Button> */}
                         <Divider type="vertical" />
-                        <span style={{color: "red", cursor: 'pointer'}} onClick={() => this.deleteStudent(record)}><DeleteOutlined /></span>
+                        <Popconfirm
+                            title="Are you sure delete this student?"
+                            onConfirm={() => this.deleteStudent(record)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <span style={{color: "red", cursor: 'pointer'}}><DeleteOutlined /></span>
+                        </Popconfirm>
+                        {/* <span style={{color: "red", cursor: 'pointer'}} onClick={() => this.deleteStudent(record)}><DeleteOutlined /></span> */}
                         {/* <Button type="danger" onClick={() => this.deleteStudent(record)}>Delete</Button> */}
                     </Fragment>
                 )
