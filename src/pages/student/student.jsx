@@ -273,8 +273,8 @@ class Student extends PureComponent {
                 >
                     <Fragment>
                             <p>Bulk Action</p>
-                            <Row style={{marginBottom: 8}}>
-                                <Col>
+                            <Row>
+                                <Col style={{marginTop: 8, marginBottom: 8}}>
                                     <Select 
                                         type="primary"
                                         allowClear
@@ -292,7 +292,7 @@ class Student extends PureComponent {
                                     </Select>
                                 
                                 </Col>
-                                <Col style={{marginLeft: 8}}>
+                                <Col style={{marginLeft: 8, marginTop: 8, marginBottom: 8}}>
                                     <Button 
                                         type="primary"
                                         disabled={!this.state.bulk_action}
