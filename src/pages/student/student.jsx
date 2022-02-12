@@ -262,7 +262,7 @@ class Student extends PureComponent {
             <Fragment>
 
                 <Card
-                    title={<h3>STUDENT LIST</h3>}
+                    title={<h5 style={{fontWeight: 'bold'}}>STUDENT LIST</h5>}
                     extra={
                         <Fragment>
                             <Button type="primary" onClick={() => this.setState({showAddEditStudentModal: true})}>
@@ -272,7 +272,7 @@ class Student extends PureComponent {
                     }
                 >
                     <Fragment>
-                            <h5>Bulk Action</h5>
+                            <p>Bulk Action</p>
                             <Row style={{marginBottom: 8}}>
                                 <Col>
                                     <Select 
