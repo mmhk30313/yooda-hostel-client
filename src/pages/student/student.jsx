@@ -154,12 +154,14 @@ class Student extends PureComponent {
                 studentList: student_res.data,
                 totalData: student_res.data_length,
                 columns,
-                loading: true,
+                // loading: true,
 
             }, () => {
                 setTimeout(() => {
                     this.setState({
+                        is_bulk_active: false,
                         loading: false,
+                        bulk_action: ''
                     });
                 }, 1000);
             });
@@ -167,7 +169,7 @@ class Student extends PureComponent {
         }else{
             message.destroy();
             message.error(student_res.message);
-            this.setState({studentList: [], totalData: 0, columns, loading: false});
+            this.setState({studentList: [], totalData: 0, columns, loading: false, is_bulk_active: false, bulk_action: ''});
         }
     };
 
@@ -230,10 +232,12 @@ class Student extends PureComponent {
         const payload = {bulk_ids: selectedRowKeys, status: bulk_action};
         // console.log({payload});
         const bulk_res = await student_api.bulkUpdate_status(payload);
+        message.destroy();
         if(bulk_res?.success){
             this.getStudents();
             message.success(bulk_res.message);
         }else{
+            this.getStudents();
             message.error(bulk_res.message);
         }
     };
@@ -258,7 +262,7 @@ class Student extends PureComponent {
             <Fragment>
 
                 <Card
-                    title={<h1>STUDENT LIST</h1>}
+                    title={<h3>STUDENT LIST</h3>}
                     extra={
                         <Fragment>
                             <Button type="primary" onClick={() => this.setState({showAddEditStudentModal: true})}>
@@ -268,7 +272,7 @@ class Student extends PureComponent {
                     }
                 >
                     <Fragment>
-                            <p><small>Bulk Action</small></p>
+                            <h5>Bulk Action</h5>
                             <Row style={{marginBottom: 8}}>
                                 <Col>
                                     <Select 
@@ -276,8 +280,8 @@ class Student extends PureComponent {
                                         allowClear
                                         disabled={!hasSelected} 
                                         loading={is_bulk_active}
-                                        value={this.state.bulk_action || 'Select an option'}
-                                        placeholder="Select an option"
+                                        value={this.state.bulk_action || 'Select'}
+                                        placeholder="Select"
                                         onChange={(value) => {
                                             // console.log({value});
                                             this.setState({bulk_action: value});
@@ -288,7 +292,7 @@ class Student extends PureComponent {
                                     </Select>
                                 
                                 </Col>
-                                <Col span={4} style={{marginLeft: 8}}>
+                                <Col style={{marginLeft: 8}}>
                                     <Button 
                                         type="primary"
                                         disabled={!this.state.bulk_action}
